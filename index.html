@@ -6,7 +6,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     body {
-      font-family: "Times New Roman", serif;
+      font-family:calibri, "Times New Roman", serif;
       background-color: #f4f4f4;
       padding: 20px;
     }
@@ -123,8 +123,11 @@
       <label>FYK Kararı ile Eklenecek Dersin Kodu-Adı:</label>
       <input type="text" id="yeniDers" required />
 
+      <label>Eklemek istediğim Dersin Grubu:</label>
+      <input type="text" id="grup" required />
+
       <label>Derslerin Gün ve Saati:</label>
-      <input type="text" id="tarih" required />
+      <input type="text" id="gunsaat" required />
 
       <label>Bölüm Seçiniz:</label>
       <select id="bolumSelect" required>
@@ -159,12 +162,14 @@
         <tr>
           <th>OBS Üzerinden Seçtiğim Dersin Kodu-Adı</th>
           <th>FYK Kararı ile Eklenecek Dersin Kodu-Adı</th>
+          <th>Dersin Grubu</th>
           <th>Derslerin Gün ve Saati</th>
         </tr>
         <tr>
           <td id="obsDersCell"></td>
           <td id="yeniDersCell"></td>
-          <td id="tarihCell"></td>
+          <td id="grupCell"></td>
+          <td id="gunsaatCell"></td>
         </tr>
       </table>
 
@@ -191,7 +196,8 @@
       const telefon = document.getElementById("telefon").value;
       const obsDers = document.getElementById("obsDers").value;
       const yeniDers = document.getElementById("yeniDers").value;
-      const tarih = document.getElementById("tarih").value;
+      const grup = document.getElementById("grup").value;
+      const gunsaat = document.getElementById("gunsaat").value;
       const bolum = document.getElementById("bolumSelect").value;
 
       const today = new Date();
@@ -207,7 +213,8 @@
       document.getElementById("ogrenciBilgileri").innerHTML = bilgiler;
       document.getElementById("obsDersCell").innerText = obsDers;
       document.getElementById("yeniDersCell").innerText = yeniDers;
-      document.getElementById("tarihCell").innerText = tarih;
+      document.getElementById("grupCell").innerText = grup;
+      document.getElementById("gunsaatCell").innerText = gunsaat;
       document.getElementById("tarihYeri").innerText = `Tarih: ${formattedDate}`;
       document.getElementById("imzaAlani").innerHTML = `İmza: ___________`;
       document.getElementById("bolumYazisi").innerText = bolum;
@@ -236,3 +243,4 @@
   </script>
 </body>
 </html>
+
