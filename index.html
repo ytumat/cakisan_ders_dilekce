@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Dilekçe Oluştur</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <style>
+<style>
     body {
       font-family:calibri, "Times New Roman", serif;
       background-color: #f4f4f4;
@@ -126,6 +126,9 @@
       <label>Eklemek istediğim Dersin Grubu:</label>
       <input type="number" id="grup" required />
 
+      <label>Eklenecek Ders <strong>Dahil</strong> GÜZ Yarıyılında <strong>Alınan Toplam Kredi</strong>:</label>
+      <input type="number" id="kredi" required />
+
       <label>Derslerin Gün ve Saati:</label>
       <input type="text" id="gunsaat" required />
 
@@ -173,6 +176,9 @@
         </tr>
       </table>
 
+<p style="margin-top: 20px;"><strong>Eklenecek Ders Dahil GÜZ Yarıyılında Alınan Toplam Kredi:</strong> <span id="krediBilgisi"></span></p>
+
+
       <br /><br />
       <p style="text-align: right;" id="tarihYeri"></p>
       <p style="text-align: right;" id="imzaAlani">İmza: ___________</p>
@@ -199,6 +205,10 @@
       const grup = document.getElementById("grup").value;
       const gunsaat = document.getElementById("gunsaat").value;
       const bolum = document.getElementById("bolumSelect").value;
+      const kredi = document.getElementById("kredi").value;
+
+adSoyad = `${ad}_${soyad}`.replace(/\s+/g, "_"); // Boşlukları alt çizgi yap
+
 
       const today = new Date();
       const formattedDate = today.toLocaleDateString("tr-TR");
@@ -218,6 +228,7 @@
       document.getElementById("tarihYeri").innerText = `Tarih: ${formattedDate}`;
       document.getElementById("imzaAlani").innerHTML = `İmza: ___________`;
       document.getElementById("bolumYazisi").innerText = bolum;
+      document.getElementById("krediBilgisi").innerText = kredi;
 
       // Göster
       document.getElementById("dilekceOutput").style.display = "block";
@@ -225,6 +236,7 @@
     });
 
     // PDF oluştur
+let adSoyad = "dilekce"; // varsayılan dosya adı
     document.getElementById("downloadBtn").addEventListener("click", function () {
       const element = document.getElementById("dilekceOutput");
       element.style.display = "block";
@@ -232,7 +244,7 @@
       setTimeout(() => {
         const opt = {
           margin: 0.5,
-          filename: "dilekce.pdf",
+         filename: `${adSoyad}_dilekce.pdf`,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: { scale: 2, scrollX: 0, scrollY: 0 },
           jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
@@ -243,5 +255,3 @@
   </script>
 </body>
 </html>
-
-
