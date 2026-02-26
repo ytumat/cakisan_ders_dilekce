@@ -2,265 +2,190 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dilekçe Oluştur</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-    body {
-      font-family:calibri, "Times New Roman", serif;
-      background-color: #f4f4f4;
-      padding: 20px;
-    }
+    body { font-family: Calibri, sans-serif; background-color: #f4f4f4; padding: 10px; margin: 0; }
+    .container { max-width: 600px; margin: 20px auto; background: white; padding: 25px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; }
+    
+    h2 { text-align: center; color: #333; font-size: 1.4rem; margin-bottom: 20px; }
+    label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
+    input, select { width: 100%; padding: 12px; margin-top: 6px; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    
+    .email-wrapper { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .email-wrapper input { margin-top: 0; flex: 1; }
+    .email-wrapper span { font-weight: bold; font-size: 14px; color: #555; }
 
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+    button { width: 100%; padding: 15px; font-size: 18px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 4px; margin-top: 25px; font-weight: bold; }
+    button:active { background-color: #1e7e34; transform: translateY(1px); }
 
-    input, select {
-      width: 100%;
-      padding: 8px;
-      margin-top: 6px;
-      margin-bottom: 16px;
-      font-size: 16px;
-    }
+    /* PDF Alanı - Ekranda görünmez */
+    #pdf-container { position: absolute; left: -9999px; top: 0; }
+    #dilekceOutput { background: white; color: black; width: 190mm; padding: 20mm; box-sizing: border-box; }
 
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-right: 10px;
-    }
+    .info-row { display: flex; margin-bottom: 3px; line-height: 1.2; }
+    .info-label { width: 120px; font-weight: bold; }
+    .info-separator { width: 20px; font-weight: bold; text-align: center; }
+    .info-content { flex: 1; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 40px;
-    }
-
-    table, th, td {
-      border: 1px solid black;
-      text-align: center;
-      padding: 10px;
-    }
-
-    .letter-section {
-      display: none;
-      margin-top: 40px;
-      padding: 40px;
-      background: white;
-      border: none;
-    }
-
-    .center-text {
-      text-align: center;
-      margin: 0;
-      line-height: 1.1;
-    }
-
-    .left-text {
-      text-align: justify;
-      margin-top: 20px;
-      white-space: pre-line;
-    }
-
-    .download-button {
-      display: none;
-      margin-top: 20px;
-    }
-
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-
-      .letter-section, .letter-section * {
-        visibility: visible;
-      }
-
-      .letter-section {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 210mm;
-        height: 297mm;
-        background: white !important;
-        padding: 40px;
-        margin: 0;
-        box-shadow: none !important;
-        border: none !important;
-      }
-
-      .download-button {
-        display: none !important;
-      }
-    }
-
-#epostaAltMetin {
-  color: red;
-  font-weight: bold;
-  margin-top: 50px;
-  text-align: center;
-  font-size: 11pt;
-}
-  </style>
+    .center-text { text-align: center; margin: 0; line-height: 1.2; font-weight: bold; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; margin-top: 30px; table-layout: fixed; }
+    table, th, td { border: 1px solid black; text-align: center; padding: 8px; font-size: 10pt; word-wrap: break-word; }
+    #epostaAltMetin { color: #b30000; font-weight: bold; margin-top: 40px; text-align: center; font-size: 11pt; }
+</style>
 </head>
 <body>
+
   <div class="container">
-    <h2>Çakışan Ders Alma Dilekçesi Oluşturma</h2>
+    <h2>Çakışan Ders Dilekçesi</h2>
     <form id="dilekceForm">
       <label>Adınız:</label>
       <input type="text" id="ad" required />
-
+      
       <label>Soyadınız:</label>
       <input type="text" id="soyad" required />
-
+      
       <label>Öğrenci Numarası:</label>
-      <input type="text" id="numara" required />
+      <input type="text" id="numara" inputmode="numeric" required />
 
-      <label>E-posta:</label>
-      <input type="email" id="email" placeholder="@std.yildiz.edu.tr uzantılı e-posta adresinizi yazınız" required />
+      <label>YTÜ E-posta Kullanıcı Adı:</label>
+      <div class="email-wrapper">
+          <input type="text" id="emailUser" placeholder="kullanici.adi" required oninput="emailKontrol(this)" />
+          <span>@std.yildiz.edu.tr</span>
+      </div>
+      
       <label>Cep Telefonu:</label>
-      <input type="text" id="telefon" required />
-
-      <label>OBS Üzerinden Seçtiğim Dersin Kodu-Adı:</label>
-      <input type="text" id="obsDers" required />
-
-      <label>FYK Kararı ile Eklenecek Dersin Kodu-Adı:</label>
-      <input type="text" id="yeniDers" required />
-
-      <label>Eklemek istediğim Dersin Grubu:</label>
+      <input type="text" id="telefon" inputmode="tel" required />
+      
+      <label>OBS Üzerinden Seçilen Ders:</label>
+      <input type="text" id="obsDers" placeholder="MAT1141 Matematik Analiz 1" required />
+      
+      <label>FYK ile Eklenecek Ders:</label>
+      <input type="text" id="yeniDers" placeholder="FIZ1001 Fizik 1" required />
+      
+      <label>Dersin Grubu:</label>
       <input type="number" id="grup" required />
-
-      <label>Eklenecek Ders <strong>Dahil</strong> BAHAR Yarıyılında <strong>Alınan Toplam Kredi</strong>:</label>
+      
+      <label>Toplam Kredi:</label>
       <input type="number" id="kredi" required />
+      
+      <label>Çakışma Gün/Saat:</label>
+      <input type="text" id="gunsaat" placeholder="Pazartesi 09:00" required />
 
-      <label>Derslerin Çakıştığı Gün ve Saat Bilgisi (Örnekteki gibi giriniz):</label>
-      <input type="text" id="gunsaat" placeholder="Örn: Pazartesi 09:00" required />
-
-      <label>Bölüm Seçiniz:</label>
-      <select id="bolumSelect" required>
+      <label>Bölüm:</label>
+      <select id="bolumSelect">
         <option value="MATEMATİK BÖLÜM BAŞKANLIĞINA">MATEMATİK</option>
         <option value="FİZİK BÖLÜM BAŞKANLIĞINA">FİZİK</option>
         <option value="KİMYA BÖLÜM BAŞKANLIĞINA">KİMYA</option>
         <option value="İSTATİSTİK BÖLÜM BAŞKANLIĞINA">İSTATİSTİK</option>
         <option value="MOLEKÜLER BİYOLOJİ VE GENETİK BÖLÜM BAŞKANLIĞINA">MOLEKÜLER BİYOLOJİ VE GENETİK</option>
-<option value="TÜRK DİLİ VE EDEBİYATI BÖLÜM BAŞKANLIĞINA">TÜRK DİLİ VE EDEBİYATI</option>
-<option value="BATI DİLLERİ VE EDEBİYATLARI BÖLÜM BAŞKANLIĞINA">BATI DİLLERİ VE EDEBİYATLARI</option>
+        <option value="TÜRK DİLİ VE EDEBİYATI BÖLÜM BAŞKANLIĞINA">TÜRK DİLİ VE EDEBİYATI</option>
+        <option value="BATI DİLLERİ VE EDEBİYATLARI BÖLÜM BAŞKANLIĞINA">BATI DİLLERİ VE EDEBİYATLARI</option>
       </select>
 
-
-      <button type="submit">Dilekçeyi Oluştur</button>
+      <button type="submit">📄 PDF İndir</button>
     </form>
+  </div>
 
-    <!-- Dilekçe Görünümü -->
-    <div class="letter-section" id="dilekceOutput">
-
-      <!-- Seçilen bölüm düz metin olarak -->
-      <p id="bolumYazisi" class="center-text" style="font-weight: bold; margin-bottom: 2cm;"></p>
-
-      <div class="left-text" id="ogrenciBilgileri"></div>
-
-      <p style="margin-top: 30px; text-align: justify;">
-        2025-2026 Eğitim-Öğretim yılı <strong>BAHAR</strong> döneminde çakışma nedeniyle alamadığım
-        aşağıdaki dersin 28.08.2025 tarih ve 2025/08-20 sayılı Senato Kararı
-        gereğince Öğrenci Bilgi Sistemine eklenmesi hususunda gereğini arz ederim.
-      </p>
-
-      <table>
-        <tr>
-          <th>OBS Üzerinden Seçtiğim Dersin Kodu-Adı</th>
-          <th>FYK Kararı ile Eklenecek Dersin Kodu-Adı</th>
-          <th>Dersin Grubu</th>
-          <th>Derslerin Gün ve Saati</th>
-        </tr>
-        <tr>
-          <td id="obsDersCell"></td>
-          <td id="yeniDersCell"></td>
-          <td id="grupCell"></td>
-          <td id="gunsaatCell"></td>
-        </tr>
-      </table>
-
-<p style="margin-top: 20px;"><strong>Eklenecek Ders Dahil BAHAR Yarıyılında Alınan Toplam Kredi:</strong> <span id="krediBilgisi"></span></p>
-
-
-      <br /><br />
-      <p style="text-align: right;" id="tarihYeri"></p>
-     <div id="epostaAltMetin"></div>
-    </div>
-
-    <!-- PDF indir butonu -->
-    <div class="download-button" id="downloadBtnDiv">
-      <button id="downloadBtn">📥 PDF Olarak İndir</button>
-    </div>
+  <div id="pdf-container">
+      <div id="dilekceOutput">
+        <p id="bolumYazisi" class="center-text" style="margin-bottom: 1.5cm;"></p>
+        <div class="info-row"><span class="info-label">Ad Soyad</span><span class="info-separator">:</span><span id="outAdSoyad"></span></div>
+        <div class="info-row"><span class="info-label">Öğrenci No</span><span class="info-separator">:</span><span id="outNo"></span></div>
+        <div class="info-row"><span class="info-label">E-posta</span><span class="info-separator">:</span><span id="outEmail"></span></div>
+        <div class="info-row"><span class="info-label">Telefon</span><span class="info-separator">:</span><span id="outTel"></span></div>
+        <div style="margin-bottom:1cm;"></div>
+        <p style="text-align: justify; line-height: 1.5;">
+          <span id="otomatikYil"></span> Eğitim-Öğretim yılı <strong><span class="otomatikDonem"></span></strong> döneminde çakışma nedeniyle alamadığım aşağıdaki dersin 28.08.2025 tarih ve 2025/08-20 sayılı Senato Kararı gereğince Öğrenci Bilgi Sistemine eklenmesi hususunda gereğini arz ederim.
+        </p>
+        <table>
+          <thead>
+              <tr>
+                <th width="35%">OBS'den Seçilen Ders</th>
+                <th width="35%">Eklenecek Ders</th>
+                <th width="10%">Grup</th>
+                <th width="20%">Gün/Saat</th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr><td id="obsDersCell"></td><td id="yeniDersCell"></td><td id="grupCell"></td><td id="gunsaatCell"></td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 20px;"><strong>Eklenecek Ders Dahil <span class="otomatikDonem"></span> Yarıyılında Alınan Toplam Kredi:</strong> <span id="krediBilgisi"></span></p>
+        <p style="text-align: right; margin-top: 30px;" id="tarihYeri"></p>
+        <div id="epostaAltMetin"></div>
+      </div>
   </div>
 
   <script>
-    document.getElementById("dilekceForm").addEventListener("submit", function (e) {
+    const { jsPDF } = window.jspdf;
+
+    // E-posta @ kontrolü
+    function emailKontrol(input) {
+        if (input.value.includes('@')) {
+            alert("Lütfen sadece e-posta kullanıcı adınızı yazınız. '@' işareti ve devamını eklemeyiniz.");
+            input.value = input.value.replace(/@/g, '');
+        }
+    }
+
+    function trUpper(text) { return text.replace(/i/g, "İ").replace(/ı/g, "I").toUpperCase(); }
+
+    function formatDersAdi(text) {
+        if (!text) return "";
+        let kelimeler = text.trim().split(/\s+/);
+        return kelimeler.map((kelime, index) => {
+            if (index === 0) return trUpper(kelime);
+            return kelime.charAt(0).replace(/i/g, "İ").replace(/ı/g, "I").toUpperCase() + kelime.slice(1).toLowerCase();
+        }).join(" ");
+    }
+
+    // Gün formatlama (Sadece ilk harf büyük)
+    function formatGun(text) {
+        if (!text) return "";
+        let t = text.trim();
+        return t.charAt(0).replace(/i/g, "İ").replace(/ı/g, "I").toUpperCase() + t.slice(1).toLowerCase();
+    }
+
+    document.getElementById("dilekceForm").addEventListener("submit", function(e) {
       e.preventDefault();
+      
+      const ad = trUpper(document.getElementById("ad").value);
+      const soyad = trUpper(document.getElementById("soyad").value);
+      const mail = document.getElementById("emailUser").value + "@std.yildiz.edu.tr";
+      
+      // Verileri Doldur
+      document.getElementById("outAdSoyad").innerText = ad + " " + soyad;
+      document.getElementById("outNo").innerText = document.getElementById("numara").value;
+      document.getElementById("outEmail").innerText = mail;
+      document.getElementById("outTel").innerText = document.getElementById("telefon").value;
+      document.getElementById("obsDersCell").innerText = formatDersAdi(document.getElementById("obsDers").value);
+      document.getElementById("yeniDersCell").innerText = formatDersAdi(document.getElementById("yeniDers").value);
+      document.getElementById("grupCell").innerText = document.getElementById("grup").value;
+      document.getElementById("gunsaatCell").innerText = formatGun(document.getElementById("gunsaat").value);
+      document.getElementById("krediBilgisi").innerText = document.getElementById("kredi").value;
+      document.getElementById("bolumYazisi").innerText = document.getElementById("bolumSelect").value;
+      document.getElementById("tarihYeri").innerText = "Tarih: " + new Date().toLocaleDateString("tr-TR");
+      document.getElementById("epostaAltMetin").innerText = `Bu belge ${mail} adresinden bölüme iletilmiştir.`;
 
-      // Form verilerini al
-      const ad = document.getElementById("ad").value;
-      const soyad = document.getElementById("soyad").value;
-      const numara = document.getElementById("numara").value;
-      const email = document.getElementById("email").value;
-      const telefon = document.getElementById("telefon").value;
-      const obsDers = document.getElementById("obsDers").value;
-      const yeniDers = document.getElementById("yeniDers").value;
-      const grup = document.getElementById("grup").value;
-      const gunsaat = document.getElementById("gunsaat").value;
-      const bolum = document.getElementById("bolumSelect").value;
-      const kredi = document.getElementById("kredi").value;
+      const d = new Date();
+      const donem = (d.getMonth() + 1 >= 1 && d.getMonth() + 1 <= 7) ? "BAHAR" : "GÜZ";
+      const akYil = (d.getMonth() + 1 >= 8) ? `${d.getFullYear()}-${d.getFullYear()+1}` : `${d.getFullYear()-1}-${d.getFullYear()}`;
+      document.querySelectorAll(".otomatikDonem").forEach(el => el.innerText = donem);
+      document.getElementById("otomatikYil").innerText = akYil;
 
-adSoyad = `${ad}_${soyad}`.replace(/\s+/g, "_"); // Boşlukları alt çizgi yap
-
-
-      const today = new Date();
-      const formattedDate = today.toLocaleDateString("tr-TR");
-
-      // Öğrenci bilgileri + telefon altına 2cm boşluk
-      const bilgiler = `<strong>Ad Soyad:</strong> ${ad} ${soyad}<br>
-<strong>Öğrenci No:</strong> ${numara}<br>
-<strong>E-posta:</strong> ${email}<br>
-<strong>Telefon:</strong> ${telefon}<br><div style="margin-bottom:2cm;"></div>`;
-
-      // Dilekçeye yazdır
-      document.getElementById("ogrenciBilgileri").innerHTML = bilgiler;
-      document.getElementById("obsDersCell").innerText = obsDers;
-      document.getElementById("yeniDersCell").innerText = yeniDers;
-      document.getElementById("grupCell").innerText = grup;
-      document.getElementById("gunsaatCell").innerText = gunsaat;
-      document.getElementById("tarihYeri").innerText = `Tarih: ${formattedDate}`;
-      document.getElementById("epostaAltMetin").innerText = `Bu belge ${email} adresinden bölüme iletilmiştir.`;
-      document.getElementById("bolumYazisi").innerText = bolum;
-      document.getElementById("krediBilgisi").innerText = kredi;
-
-      // Göster
-      document.getElementById("dilekceOutput").style.display = "block";
-      document.getElementById("downloadBtnDiv").style.display = "block";
-    });
-
-    // PDF oluştur
-let adSoyad = "dilekce"; // varsayılan dosya adı
-    document.getElementById("downloadBtn").addEventListener("click", function () {
-      const element = document.getElementById("dilekceOutput");
-      element.style.display = "block";
-
-      setTimeout(() => {
-        const opt = {
-          margin: 0.5,
-         filename: `${adSoyad}_dilekce.pdf`,
-          image: { type: "jpeg", quality: 0.98 },
-          html2canvas: { scale: 2, scrollX: 0, scrollY: 0 },
-          jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
-        };
-        html2pdf().set(opt).from(element).save();
-      }, 200);
+      // PDF Oluşturma Başlat
+      const input = document.getElementById('dilekceOutput');
+      html2canvas(input, { scale: 2, useCORS: true, backgroundColor: "#FFFFFF" }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`${ad}_${soyad}_Cakisma_Dilekcesi.pdf`);
+      });
     });
   </script>
 </body>
 </html>
-
-
