@@ -62,13 +62,13 @@
       <label>OBS Üzerinden Seçilen Ders:</label>
       <input type="text" id="obsDers" placeholder="MAT1141 Matematik Analiz 1" required />
       
-      <label>FYK ile Eklenecek Ders:</label>
+      <label>Çakışma Nedeniyle Eklenecek Ders:</label>
       <input type="text" id="yeniDers" placeholder="FIZ1001 Fizik 1" required />
       
-      <label>Dersin Grubu:</label>
+      <label>Eklenecek Dersin Grubu:</label>
       <input type="number" id="grup" required />
       
-      <label>Toplam Kredi:</label>
+      <label>Eklenecek Ders Dahil Alınan Toplam Kredi:</label>
       <input type="number" id="kredi" required />
       
       <label>Çakışma Gün/Saat:</label>
@@ -120,6 +120,16 @@
   </div>
 
   <script>
+
+function formatTelefon(text) {
+    let num = text.replace(/\D/g, ''); // Rakam dışı her şeyi sil
+    if (num.startsWith('0')) num = num.substring(1); // Baştaki 0'ı at
+    if (num.length === 10) {
+        return `(${num.substring(0, 3)}) ${num.substring(3, 6)} ${num.substring(6, 10)}`;
+    }
+    return text; // 10 hane değilse olduğu gibi bırak
+}
+
     const { jsPDF } = window.jspdf;
 
     // E-posta @ kontrolü
@@ -159,7 +169,7 @@
       document.getElementById("outAdSoyad").innerText = ad + " " + soyad;
       document.getElementById("outNo").innerText = document.getElementById("numara").value;
       document.getElementById("outEmail").innerText = mail;
-      document.getElementById("outTel").innerText = document.getElementById("telefon").value;
+      document.getElementById("outTel").innerText = formatTelefon(document.getElementById("telefon").value);
       document.getElementById("obsDersCell").innerText = formatDersAdi(document.getElementById("obsDers").value);
       document.getElementById("yeniDersCell").innerText = formatDersAdi(document.getElementById("yeniDers").value);
       document.getElementById("grupCell").innerText = document.getElementById("grup").value;
