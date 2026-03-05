@@ -14,9 +14,50 @@
     label { display: block; margin-top: 15px; font-weight: bold; font-size: 14px; }
     input, select { width: 100%; padding: 12px; margin-top: 6px; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
     
-    .email-wrapper { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-    .email-wrapper input { margin-top: 0; flex: 1; }
-    .email-wrapper span { font-weight: bold; font-size: 14px; color: #555; }
+.email-wrapper { 
+    display: flex; 
+    align-items: stretch; /* Boyları eşitlemek için hayati */
+    margin-top: 6px; 
+    height: 45px; /* Standart yükseklik */
+}
+
+#mduldul { 
+    flex: 1;
+    margin-top: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    height: 100% !important;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    line-height: normal; /* İç yazı kaymasını engeller */
+}
+
+.email-wrapper input { 
+    margin-top: 0; 
+    flex: 1; 
+    height: 100% !important; /* Kapsayıcıyla aynı yüksekliğe getirir */
+    border-top-right-radius: 0; 
+    border-bottom-right-radius: 0; 
+    border-right: none; 
+}
+
+.email-wrapper span { 
+    display: flex;
+    align-items: center;
+    background-color: #e7f1ff; 
+    color: #0056b3; 
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-left: none; /* Input ile birleşim */
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    font-weight: bold;
+    font-size: 13px;
+    white-space: nowrap;
+    height: 100%;
+    box-sizing: border-box;
+}
 
     button { width: 100%; padding: 15px; font-size: 18px; cursor: pointer; background-color: #28a745; color: white; border: none; border-radius: 4px; margin-top: 25px; font-weight: bold; }
     button:active { background-color: #1e7e34; transform: translateY(1px); }
@@ -51,10 +92,15 @@
       <input type="text" id="numara" inputmode="numeric" required />
 
       <label>YTÜ E-posta Kullanıcı Adı:</label>
-      <div class="email-wrapper">
-          <input type="text" id="emailUser" placeholder="kullanici.adi" required oninput="emailKontrol(this)" />
-          <span>@std.yildiz.edu.tr</span>
-      </div>
+<div class="email-wrapper">
+    <input type="text" id="mduldul" 
+           name="v_field_77" 
+           placeholder="kullanici.adi" 
+           required 
+           autocomplete="new-password" 
+           oninput="emailKontrol(this)" />
+    <span>@std.yildiz.edu.tr</span>
+</div>
       
       <label>Cep Telefonu:</label>
       <input type="text" id="telefon" inputmode="tel" required />
@@ -163,7 +209,7 @@ function formatTelefon(text) {
       
       const ad = trUpper(document.getElementById("ad").value);
       const soyad = trUpper(document.getElementById("soyad").value);
-      const mail = document.getElementById("emailUser").value + "@std.yildiz.edu.tr";
+      const mail = document.getElementById("mduldul").value + "@std.yildiz.edu.tr";
       
       // Verileri Doldur
       document.getElementById("outAdSoyad").innerText = ad + " " + soyad;
@@ -199,5 +245,3 @@ function formatTelefon(text) {
   </script>
 </body>
 </html>
-
-
